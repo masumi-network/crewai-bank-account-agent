@@ -1,0 +1,47 @@
+[
+  {
+    "id": "tx_001",
+    "date": "2025-03-02T15:17:50.405757",
+    "amount": 14.99,
+    "currency": "USD",
+    "description": "Netflix Monthly Subscription",
+    "category": "Subscriptions",
+    "merchant": "Netflix"
+  },
+  {
+    "id": "tx_002",
+    "date": "2025-03-02T15:17:50.405766",
+    "amount": 9.99,
+    "currency": "USD",
+    "description": "Spotify Premium",
+    "category": "Subscriptions",
+    "merchant": "Spotify"
+  },
+  {
+    "id": "tx_003",
+    "date": "2025-03-04T15:17:50.405768",
+    "amount": 45.5,
+    "currency": "USD",
+    "description": "Grocery Store Purchase",
+    "category": "Food & Dining",
+    "merchant": "Whole Foods"
+  },
+  {
+    "id": "tx_004",
+    "date": "2025-03-05T15:17:50.405769",
+    "amount": 120.0,
+    "currency": "USD",
+    "description": "Electricity Bill",
+    "category": "Utilities",
+    "merchant": "Power Company"
+  },
+  {
+    "id": "tx_005",
+    "date": "2025-03-07T15:17:50.405771",
+    "amount": 25.0,
+    "currency": "USD",
+    "description": "Food Delivery",
+    "category": "Food & Dining",
+    "merchant": "DoorDash"
+  }
+]
