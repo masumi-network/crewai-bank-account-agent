@@ -1,0 +1,184 @@
+{
+  "transactions": [
+    {
+      "id": "tx_001",
+      "date": "2024-02-01T10:00:00Z",
+      "amount": 14.99,
+      "currency": "USD",
+      "description": "Netflix Monthly Subscription",
+      "category": "Subscriptions",
+      "merchant": "Netflix"
+    },
+    {
+      "id": "tx_002",
+      "date": "2024-02-01T11:00:00Z",
+      "amount": 9.99,
+      "currency": "USD",
+      "description": "Spotify Premium",
+      "category": "Subscriptions",
+      "merchant": "Spotify"
+    },
+    {
+      "id": "tx_003",
+      "date": "2024-02-02T09:30:00Z",
+      "amount": 45.50,
+      "currency": "USD",
+      "description": "Grocery Store Purchase",
+      "category": "Food & Dining",
+      "merchant": "Whole Foods"
+    },
+    {
+      "id": "tx_004",
+      "date": "2024-02-02T14:20:00Z",
+      "amount": 120.00,
+      "currency": "USD",
+      "description": "Electricity Bill",
+      "category": "Utilities",
+      "merchant": "Power Company"
+    },
+    {
+      "id": "tx_005",
+      "date": "2024-02-03T12:00:00Z",
+      "amount": 25.00,
+      "currency": "USD",
+      "description": "Food Delivery",
+      "category": "Food & Dining",
+      "merchant": "DoorDash"
+    },
+    {
+      "id": "tx_006",
+      "date": "2024-02-03T15:30:00Z",
+      "amount": 49.99,
+      "currency": "USD",
+      "description": "Amazon Prime Membership",
+      "category": "Subscriptions",
+      "merchant": "Amazon"
+    },
+    {
+      "id": "tx_007",
+      "date": "2024-02-04T08:45:00Z",
+      "amount": 4.50,
+      "currency": "USD",
+      "description": "Morning Coffee",
+      "category": "Food & Dining",
+      "merchant": "Starbucks"
+    },
+    {
+      "id": "tx_008",
+      "date": "2024-02-04T19:20:00Z",
+      "amount": 89.99,
+      "currency": "USD",
+      "description": "Internet Service",
+      "category": "Utilities",
+      "merchant": "Comcast"
+    },
+    {
+      "id": "tx_009",
+      "date": "2024-02-05T11:30:00Z",
+      "amount": 60.00,
+      "currency": "USD",
+      "description": "Gas Station",
+      "category": "Transportation",
+      "merchant": "Shell"
+    },
+    {
+      "id": "tx_010",
+      "date": "2024-02-05T14:15:00Z",
+      "amount": 12.99,
+      "currency": "USD",
+      "description": "Disney+ Subscription",
+      "category": "Subscriptions",
+      "merchant": "Disney+"
+    },
+    {
+      "id": "tx_011",
+      "date": "2024-02-06T09:00:00Z",
+      "amount": 35.00,
+      "currency": "USD",
+      "description": "Gym Membership",
+      "category": "Health & Fitness",
+      "merchant": "LA Fitness"
+    },
+    {
+      "id": "tx_012",
+      "date": "2024-02-06T13:20:00Z",
+      "amount": 28.50,
+      "currency": "USD",
+      "description": "Lunch with Colleagues",
+      "category": "Food & Dining",
+      "merchant": "Chipotle"
+    },
+    {
+      "id": "tx_013",
+      "date": "2024-02-07T10:00:00Z",
+      "amount": 75.00,
+      "currency": "USD",
+      "description": "Mobile Phone Bill",
+      "category": "Utilities",
+      "merchant": "Verizon"
+    },
+    {
+      "id": "tx_014",
+      "date": "2024-02-07T16:45:00Z",
+      "amount": 22.99,
+      "currency": "USD",
+      "description": "Food Delivery",
+      "category": "Food & Dining",
+      "merchant": "Uber Eats"
+    },
+    {
+      "id": "tx_015",
+      "date": "2024-02-08T11:30:00Z",
+      "amount": 1500.00,
+      "currency": "USD",
+      "description": "Monthly Rent",
+      "category": "Housing",
+      "merchant": "Property Management"
+    },
+    {
+      "id": "tx_016",
+      "date": "2024-02-08T14:20:00Z",
+      "amount": 15.99,
+      "currency": "USD",
+      "description": "HBO Max Subscription",
+      "category": "Subscriptions",
+      "merchant": "HBO"
+    },
+    {
+      "id": "tx_017",
+      "date": "2024-02-09T09:15:00Z",
+      "amount": 42.00,
+      "currency": "USD",
+      "description": "Grocery Shopping",
+      "category": "Food & Dining",
+      "merchant": "Trader Joe's"
+    },
+    {
+      "id": "tx_018",
+      "date": "2024-02-09T20:00:00Z",
+      "amount": 65.00,
+      "currency": "USD",
+      "description": "Dinner Date",
+      "category": "Food & Dining",
+      "merchant": "Olive Garden"
+    },
+    {
+      "id": "tx_019",
+      "date": "2024-02-10T12:30:00Z",
+      "amount": 29.99,
+      "currency": "USD",
+      "description": "Adobe Creative Cloud",
+      "category": "Subscriptions",
+      "merchant": "Adobe"
+    },
+    {
+      "id": "tx_020",
+      "date": "2024-02-10T15:45:00Z",
+      "amount": 80.00,
+      "currency": "USD",
+      "description": "Clothing Purchase",
+      "category": "Shopping",
+      "merchant": "H&M"
+    }
+  ]
+} 

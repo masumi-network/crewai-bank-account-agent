@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 from pathlib import Path
 from typing import List, Dict
@@ -7,136 +7,46 @@ from dotenv import load_dotenv
 from crewai import Agent, Task, Crew
 from langchain.tools import Tool
 import pandas as pd
+from fpdf import FPDF
 
-print("Debug: Starting environment setup...")
-
-# Get the current working directory
+# Initialize paths
 current_dir = Path.cwd()
 env_path = current_dir / '.env'
-print(f"Debug: Looking for .env file at: {env_path}")
-print(f"Debug: .env file exists: {env_path.exists()}")
+mock_data_path = current_dir / 'mock_data' / 'transactions.json'
 
-if env_path.exists():
-    print("\nDebug: Reading .env file contents:")
-    with open(env_path, 'r') as f:
-        env_contents = f.read().strip()
-        print("First few characters of each line:")
-        for line in env_contents.split('\n'):
-            if line.strip():  # Only process non-empty lines
-                if 'API_KEY' in line:
-                    key_part = line.split('=')[0]
-                    print(f"{key_part}=****")
-                else:
-                    print(line[:20] + "..." if len(line) > 20 else line)
+def load_mock_transactions() -> List[Dict]:
+    """Load mock transactions from JSON file"""
+    try:
+        with open(mock_data_path, 'r') as f:
+            data = json.load(f)
+            return data['transactions']
+    except FileNotFoundError:
+        print(f"Warning: Mock data file not found at {mock_data_path}")
+        return []
+    except (json.JSONDecodeError, KeyError):
+        print("Warning: Error loading mock transactions data")
+        return []
 
-# Try different methods to load the environment variables
-print("\nDebug: Attempting to load environment variables...")
+# Load environment variables
 load_dotenv(dotenv_path=env_path, override=True)
 
-# Also try direct environment variable setting
-if env_path.exists():
-    with open(env_path, 'r') as f:
-        for line in f:
-            if '=' in line:
-                key, value = line.strip().split('=', 1)
-                os.environ[key] = value
-
-# Debug: Print all environment variables (excluding the actual API key value)
-print("\nDebug: Environment Variables after loading:")
-for key in os.environ:
-    if 'API_KEY' in key:
-        print(f"{key}: {'*' * 10}")
-    else:
-        print(f"{key}: {os.environ[key][:50]}..." if len(os.environ[key]) > 50 else f"{key}: {os.environ[key]}")
-
-# Verify OpenAI API key is loaded
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    print("\nError: OPENAI_API_KEY not found!")
-    print("Please ensure your .env file contains a line like:")
-    print("OPENAI_API_KEY=sk-...")
-    print("\nTry one of these solutions:")
-    print("1. Create a new .env file:")
-    print("   echo 'OPENAI_API_KEY=your-key-here' > .env")
-    print("2. Set the environment variable directly:")
-    print("   export OPENAI_API_KEY='your-key-here'")
-    print("3. Check file permissions:")
-    print("   chmod 600 .env")
-    raise ValueError("OPENAI_API_KEY not found in environment variables. Please check your .env file.")
-else:
-    print(f"\nDebug: OPENAI_API_KEY found with length: {len(api_key)}")
-    if not api_key.startswith('sk-'):
-        print("Warning: API key format might be incorrect (should start with 'sk-')")
-
-# Mock transaction data covering different scenarios
-MOCK_TRANSACTIONS = [
-    {
-        "id": "tx_001",
-        "date": (datetime.now() - timedelta(days=5)).isoformat(),
-        "amount": 14.99,
-        "currency": "USD",
-        "description": "Netflix Monthly Subscription",
-        "category": "Subscriptions",
-        "merchant": "Netflix"
-    },
-    {
-        "id": "tx_002",
-        "date": (datetime.now() - timedelta(days=5)).isoformat(),
-        "amount": 9.99,
-        "currency": "USD",
-        "description": "Spotify Premium",
-        "category": "Subscriptions",
-        "merchant": "Spotify"
-    },
-    {
-        "id": "tx_003",
-        "date": (datetime.now() - timedelta(days=3)).isoformat(),
-        "amount": 45.50,
-        "currency": "USD",
-        "description": "Grocery Store Purchase",
-        "category": "Food & Dining",
-        "merchant": "Whole Foods"
-    },
-    {
-        "id": "tx_004",
-        "date": (datetime.now() - timedelta(days=2)).isoformat(),
-        "amount": 120.00,
-        "currency": "USD",
-        "description": "Electricity Bill",
-        "category": "Utilities",
-        "merchant": "Power Company"
-    },
-    {
-        "id": "tx_005",
-        "date": datetime.now().isoformat(),
-        "amount": 25.00,
-        "currency": "USD",
-        "description": "Food Delivery",
-        "category": "Food & Dining",
-        "merchant": "DoorDash"
-    }
-]
+# Load mock transactions
+MOCK_TRANSACTIONS = load_mock_transactions()
 
 class FinancialAnalysisTools:
     @staticmethod
     def analyze_spending_patterns(transactions) -> Dict:
         """Analyze spending patterns in the transactions"""
-        # Handle different input formats
         if isinstance(transactions, str):
-            # Handle various string inputs that agents might use
-            if transactions.lower() in ["transaction data", "provided transaction data", "transactions"]:
-                transactions = MOCK_TRANSACTIONS
+            transactions = MOCK_TRANSACTIONS
         
-        # Ensure we have a list of transactions
         if not isinstance(transactions, list):
-            print(f"Debug: Received transaction type: {type(transactions)}")
-            print(f"Debug: Transaction content: {transactions}")
-            transactions = MOCK_TRANSACTIONS  # Fallback to mock data
+            transactions = MOCK_TRANSACTIONS
             
         df = pd.DataFrame(transactions)
         df['date'] = pd.to_datetime(df['date'])
         
-        analysis = {
+        return {
             "total_spend": float(df['amount'].sum()),
             "average_transaction": float(df['amount'].mean()),
             "by_category": df.groupby('category')['amount'].sum().to_dict(),
@@ -148,22 +58,12 @@ class FinancialAnalysisTools:
                 "end": df['date'].max().isoformat()
             }
         }
-        return analysis
 
     @staticmethod
     def identify_savings_opportunities(transactions) -> List[Dict]:
         """Identify potential savings opportunities"""
-        # Handle different input formats
-        if isinstance(transactions, str):
-            # Handle various string inputs that agents might use
-            if transactions.lower() in ["transaction data", "provided transaction data", "transactions"]:
-                transactions = MOCK_TRANSACTIONS
-        
-        # Ensure we have a list of transactions
-        if not isinstance(transactions, list):
-            print(f"Debug: Received transaction type: {type(transactions)}")
-            print(f"Debug: Transaction content: {transactions}")
-            transactions = MOCK_TRANSACTIONS  # Fallback to mock data
+        if isinstance(transactions, str) or not isinstance(transactions, list):
+            transactions = MOCK_TRANSACTIONS
             
         df = pd.DataFrame(transactions)
         opportunities = []
@@ -183,7 +83,7 @@ class FinancialAnalysisTools:
         # Check for high food delivery costs
         food_delivery = df[df['description'].str.contains('Delivery', case=False, na=False)]
         if not food_delivery.empty:
-            potential_savings = float(food_delivery['amount'].sum() * 0.7)  # Assume 70% could be saved by cooking
+            potential_savings = float(food_delivery['amount'].sum() * 0.7)
             opportunities.append({
                 "type": "food_costs",
                 "description": "Consider reducing food delivery services",
@@ -196,8 +96,245 @@ class FinancialAnalysisTools:
 
         return opportunities
 
+class ReportGenerator:
+    def __init__(self, google_creds_path=None, user_email=None):
+        self.output_dir = Path("test_results")
+        self.output_dir.mkdir(exist_ok=True)
+        self.google_creds_path = google_creds_path
+        self.user_email = user_email
+        self.sheets_client = None
+        if google_creds_path:
+            self._init_google_client()
+
+    def _init_google_client(self):
+        """Initialize Google Sheets client"""
+        try:
+            import gspread
+            from google.oauth2.service_account import Credentials
+
+            scopes = [
+                'https://www.googleapis.com/auth/spreadsheets',
+                'https://www.googleapis.com/auth/drive'
+            ]
+
+            if not Path(self.google_creds_path).exists():
+                print(f"Error: Credentials file not found at {self.google_creds_path}")
+                return
+
+            credentials = Credentials.from_service_account_file(
+                self.google_creds_path, 
+                scopes=scopes
+            )
+            self.sheets_client = gspread.authorize(credentials)
+            print("Successfully initialized Google Sheets client")
+        except Exception as e:
+            print(f"Error initializing Google Sheets client: {str(e)}")
+            self.sheets_client = None
+
+    def _generate_sheets_report(self, analysis_data: Dict, savings_opportunities: List[Dict], timestamp: str) -> str:
+        """Generate a Google Sheets report"""
+        if not self.sheets_client:
+            print("Google Sheets client not initialized")
+            return None
+
+        try:
+            # Create new spreadsheet
+            spreadsheet_title = f"Financial Analysis Report {timestamp}"
+            spreadsheet = self.sheets_client.create(spreadsheet_title)
+
+            # Get the first sheet
+            summary_sheet = spreadsheet.sheet1
+            summary_sheet.update_title("Summary")
+
+            # Prepare summary data
+            summary_data = [
+                ["Financial Analysis Report", ""],
+                ["Generated at", datetime.now().isoformat()],
+                ["", ""],
+                ["Summary", ""],
+                ["Total Spend", f"${analysis_data['total_spend']:.2f}"],
+                ["Average Transaction", f"${analysis_data['average_transaction']:.2f}"],
+                ["Number of Transactions", analysis_data['transaction_count']],
+                ["", ""],
+                ["Spending by Category", "Amount"]
+            ]
+
+            # Add category breakdown
+            for category, amount in analysis_data['by_category'].items():
+                summary_data.append([category, f"${amount:.2f}"])
+
+            # Update summary sheet
+            summary_sheet.update("A1", summary_data)
+
+            # Create Savings Opportunities sheet
+            savings_sheet = spreadsheet.add_worksheet("Savings Opportunities", 100, 20)
+            
+            # Enhanced savings data with detailed breakdown
+            savings_data = [
+                ["Savings Opportunities Analysis", "", "", ""],
+                ["", "", "", ""],
+                ["Category", "Description", "Current Spend", "Potential Savings"]
+            ]
+
+            # Add subscription details
+            subscription_opp = next((opp for opp in savings_opportunities if opp['type'] == 'subscription_optimization'), None)
+            if subscription_opp:
+                savings_data.append([
+                    "Subscriptions",
+                    "Current Subscription Services:",
+                    "",
+                    f"${subscription_opp['potential_savings']:.2f}"
+                ])
+                for sub in subscription_opp['details']['current_subscriptions']:
+                    savings_data.append([
+                        "",
+                        sub['merchant'],
+                        f"${sub['amount']:.2f}",
+                        ""
+                    ])
+                savings_data.append(["", "", "", ""])
+
+            # Add food delivery details
+            food_opp = next((opp for opp in savings_opportunities if opp['type'] == 'food_costs'), None)
+            if food_opp:
+                savings_data.append([
+                    "Food Delivery",
+                    "Current Food Delivery Spending:",
+                    f"${food_opp['details']['current_monthly_delivery_spend']:.2f}",
+                    f"${food_opp['potential_savings']:.2f}"
+                ])
+                savings_data.append([
+                    "",
+                    f"Number of delivery transactions: {food_opp['details']['delivery_transactions']}",
+                    "",
+                    ""
+                ])
+                savings_data.append(["", "", "", ""])
+
+            # Add total potential savings
+            total_savings = sum(opp['potential_savings'] for opp in savings_opportunities)
+            savings_data.append([
+                "Total Potential Monthly Savings",
+                "",
+                "",
+                f"${total_savings:.2f}"
+            ])
+
+            # Update savings sheet
+            savings_sheet.update("A1", savings_data)
+
+            # Format sheets
+            summary_sheet.format("A1:B1", {
+                "backgroundColor": {"red": 0.9, "green": 0.9, "blue": 0.9},
+                "textFormat": {"bold": True}
+            })
+            
+            savings_sheet.format("A1:D1", {
+                "backgroundColor": {"red": 0.9, "green": 0.9, "blue": 0.9},
+                "textFormat": {"bold": True}
+            })
+            savings_sheet.format("A3:D3", {
+                "backgroundColor": {"red": 0.95, "green": 0.95, "blue": 0.95},
+                "textFormat": {"bold": True}
+            })
+            
+            savings_sheet.format("C:D", {
+                "numberFormat": {"type": "CURRENCY"}
+            })
+
+            # Adjust column widths
+            savings_sheet.columns_auto_resize(0, 4)
+            summary_sheet.columns_auto_resize(0, 2)
+
+            # Share with user if email is provided
+            if self.user_email:
+                spreadsheet.share(self.user_email, perm_type='user', role='writer')
+                print(f"Shared spreadsheet with {self.user_email}")
+
+            return spreadsheet.url
+
+        except Exception as e:
+            print(f"Error generating Google Sheets report: {str(e)}")
+            return None
+
+    def generate_report(self, analysis_data: Dict, savings_opportunities: List[Dict], 
+                       formats=["json", "pdf", "sheets"]) -> Dict[str, str]:
+        """Generate reports in specified formats"""
+        report_files = {}
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        if "json" in formats:
+            json_path = self._generate_json_report(analysis_data, savings_opportunities, timestamp)
+            report_files["json"] = str(json_path)
+            
+        if "pdf" in formats:
+            pdf_path = self._generate_pdf_report(analysis_data, savings_opportunities, timestamp)
+            report_files["pdf"] = str(pdf_path)
+
+        if "sheets" in formats and self.sheets_client:
+            sheet_url = self._generate_sheets_report(analysis_data, savings_opportunities, timestamp)
+            if sheet_url:
+                report_files["sheets"] = sheet_url
+                print(f"Google Sheets report created: {sheet_url}")
+            
+        return report_files
+
+    def _generate_json_report(self, analysis_data: Dict, savings_opportunities: List[Dict], timestamp: str) -> Path:
+        """Generate a JSON report"""
+        report_data = {
+            "analysis": analysis_data,
+            "savings_opportunities": savings_opportunities,
+            "generated_at": datetime.now().isoformat()
+        }
+        
+        file_path = self.output_dir / f"financial_report_{timestamp}.json"
+        with open(file_path, "w") as f:
+            json.dump(report_data, f, indent=2)
+            
+        return file_path
+
+    def _generate_pdf_report(self, analysis_data: Dict, savings_opportunities: List[Dict], timestamp: str) -> Path:
+        """Generate a PDF report"""
+        pdf = FPDF()
+        pdf.add_page()
+        
+        # Title
+        pdf.set_font("Arial", "B", 16)
+        pdf.cell(0, 10, "Financial Analysis Report", ln=True, align="C")
+        pdf.ln(10)
+        
+        # Summary Section
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0, 10, "Summary", ln=True)
+        pdf.set_font("Arial", "", 12)
+        pdf.cell(0, 10, f"Total Spend: ${analysis_data['total_spend']:.2f}", ln=True)
+        pdf.cell(0, 10, f"Average Transaction: ${analysis_data['average_transaction']:.2f}", ln=True)
+        pdf.cell(0, 10, f"Number of Transactions: {analysis_data['transaction_count']}", ln=True)
+        pdf.ln(5)
+        
+        # Category Breakdown
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0, 10, "Spending by Category", ln=True)
+        pdf.set_font("Arial", "", 12)
+        for category, amount in analysis_data['by_category'].items():
+            pdf.cell(0, 10, f"{category}: ${amount:.2f}", ln=True)
+        pdf.ln(5)
+        
+        # Savings Opportunities
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0, 10, "Savings Opportunities", ln=True)
+        pdf.set_font("Arial", "", 12)
+        for opportunity in savings_opportunities:
+            pdf.cell(0, 10, f"{opportunity['description']}", ln=True)
+            pdf.cell(0, 10, f"Potential Savings: ${opportunity['potential_savings']:.2f}", ln=True)
+            pdf.ln(5)
+        
+        file_path = self.output_dir / f"financial_report_{timestamp}.pdf"
+        pdf.output(str(file_path))
+        
+        return file_path
+
 def create_financial_crew() -> Crew:
-    # Create tools with more detailed descriptions
     tools = [
         Tool(
             name="analyze_spending_patterns",
@@ -211,7 +348,6 @@ def create_financial_crew() -> Crew:
         )
     ]
 
-    # Create agents with more specific goals
     analyst = Agent(
         role='Financial Analyst',
         goal='Analyze transaction data to identify spending patterns and trends',
@@ -228,7 +364,6 @@ def create_financial_crew() -> Crew:
         verbose=True
     )
 
-    # Create more specific tasks
     analysis_task = Task(
         description="""
         Analyze the provided transaction data to:
@@ -253,18 +388,14 @@ def create_financial_crew() -> Crew:
         agent=advisor
     )
 
-    # Create crew
-    crew = Crew(
+    return Crew(
         agents=[analyst, advisor],
         tasks=[analysis_task, advice_task],
         verbose=True
     )
 
-    return crew
-
 def main():
-    print("Starting Financial Analysis Test")
-    print("-" * 50)
+    print("Starting Financial Analysis")
     
     # Create output directory
     output_dir = Path("test_results")
@@ -274,28 +405,41 @@ def main():
         # Save mock transactions
         with open(output_dir / "mock_transactions.json", "w") as f:
             json.dump(MOCK_TRANSACTIONS, f, indent=2)
-        print("\nMock transactions saved to test_results/mock_transactions.json")
         
-        # Create and run the crew
+        # Run analysis
         crew = create_financial_crew()
         result = crew.kickoff()
         
-        # Save results
+        # Save crew analysis results
         with open(output_dir / "analysis_results.txt", "w") as f:
             f.write(result)
-        print("\nAnalysis results saved to test_results/analysis_results.txt")
         
-        # Print summary
-        print("\nAnalysis Summary:")
-        print("-" * 30)
-        
-        # Run direct analysis for verification
+        # Generate reports
         tools = FinancialAnalysisTools()
         patterns = tools.analyze_spending_patterns(MOCK_TRANSACTIONS)
         opportunities = tools.identify_savings_opportunities(MOCK_TRANSACTIONS)
         
-        print(f"\nTotal Spend: ${patterns['total_spend']:.2f}")
+        # Initialize report generator
+        google_creds_path = current_dir / 'mock_data' / 'crewai-bank-account-5b906d445427.json'
+        user_email = os.getenv('GOOGLE_SHEETS_USER_EMAIL')
+        
+        report_gen = ReportGenerator(
+            google_creds_path=google_creds_path,
+            user_email=user_email
+        )
+        
+        # Generate reports
+        report_files = report_gen.generate_report(
+            patterns, 
+            opportunities, 
+            formats=["json", "pdf", "sheets"]
+        )
+        
+        # Print summary
+        print("\nAnalysis Summary:")
+        print(f"Total Spend: ${patterns['total_spend']:.2f}")
         print(f"Average Transaction: ${patterns['average_transaction']:.2f}")
+        
         print("\nSpending by Category:")
         for category, amount in patterns['by_category'].items():
             print(f"  {category}: ${amount:.2f}")
@@ -305,8 +449,14 @@ def main():
             print(f"  {opp['description']}")
             print(f"  Potential Savings: ${opp['potential_savings']:.2f}")
             
+        print("\nGenerated Reports:")
+        for format, path in report_files.items():
+            print(f"  {format.upper()} Report: {path}")
+            
     except Exception as e:
-        print(f"\nError during analysis: {str(e)}")
+        print(f"Error during analysis: {str(e)}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main() 

@@ -34,3 +34,5 @@ wheels/
 
 # Project specific
 job_results/ 
+google_credentials.json
+mock_data/crewai-bank-account-5b906d445427.json
