@@ -15,7 +15,7 @@ Wise Account Analysis with CrewAI is a powerful financial analysis tool that con
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/crewai-bank-account-agent.git
+   git clone https://github.com/masumi-network/crewai-bank-account-agent/tree/main
    cd crewai-bank-account-agent
    ```
 
