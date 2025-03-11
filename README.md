@@ -1,52 +1,78 @@
-# CrewAI Bank Account Agent for Wise
+# Wise Account Analysis with CrewAI
 
-This application provides a Streamlit-based dashboard for analyzing your Wise account data using CrewAI agents. The agents analyze your transactions and balances to provide optimization recommendations.
+## Overview
+
+Wise Account Analysis with CrewAI is a powerful financial analysis tool that connects to your Wise account to analyze your balances and transactions. It uses CrewAI to create a team of specialized AI agents that provide personalized financial insights and recommendations based on your real financial data.
 
 ## Features
 
-- Connect to Wise API (read-only)
-- Visualize account balances and transactions
-- Get AI-powered financial insights and recommendations
-- Export reports in PDF, JSON, or Google Sheets format
-- Support for both Wise production and sandbox environments
+- **Real-time Wise Integration**: Connect directly to your Wise account to fetch real transaction data and account balances
+- **Comprehensive Dashboard**: Visualize your financial data with interactive charts and metrics
+- **AI-powered Analysis**: Get personalized financial insights from a team of AI agents
+- **Export Functionality**: Export your financial data and analysis results in various formats
 
-## Setup
+## Quick Start
 
-1. Clone this repository
-2. Install dependencies:
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/yourusername/crewai-bank-account-agent.git
+   cd crewai-bank-account-agent
    ```
+
+2. **Install dependencies**:
+   ```bash
    pip install -r requirements.txt
    ```
-3. Run the Streamlit app:
-   ```
+
+3. **Run the application**:
+   ```bash
    streamlit run app.py
    ```
-4. Select your environment (Sandbox or Production) and enter your Wise API key in the web interface
 
-## Wise API Key
+4. **Open in your browser**:
+   The application will be available at http://localhost:8501
 
-### Sandbox Environment (for testing)
+## Requirements
 
-1. Sign up for a Wise developer account at [https://sandbox.transferwise.tech/register](https://sandbox.transferwise.tech/register)
-2. Create a new API token with read-only permissions
-3. Copy the token and use it in the application
+- Python 3.8 or higher
+- Wise API key (sandbox or production)
+- OpenAI API key
 
-The sandbox environment allows you to test the application without using real account data.
+## How It Works
 
-### Production Environment (for real account data)
+1. **Connect to Wise**: Enter your Wise API key and select the environment (sandbox or production)
+2. **View Your Data**: Explore your account balances and transaction history in the Dashboard and Transactions tabs
+3. **Generate AI Analysis**: Get personalized financial insights and recommendations from the AI Analysis tab
+4. **Export Results**: Export your financial data and analysis results in various formats
 
-1. Log in to your Wise account
-2. Go to Settings > API tokens
-3. Create a new token with read-only permissions
-4. Copy the token and use it in the application
+## AI Analysis
 
-## Security Note
+The application uses CrewAI to create a team of specialized AI agents:
 
-Your API key is only stored temporarily in the Streamlit session state and is never persisted to disk. All data processing happens locally on your machine.
+1. **Financial Data Analyst**: Analyzes patterns and trends in your financial data
+2. **Financial Advisor**: Provides personalized financial advice
+3. **Budget Optimizer**: Identifies opportunities to optimize your spending
 
-## Project Structure
+## Documentation
 
-- `app.py`: Main Streamlit application
-- `wise/`: Wise API client
-- `agents/`: CrewAI agents and tasks
-- `utils/`: Utility functions for data processing and export 
+For detailed documentation, see [DOCUMENTATION.md](DOCUMENTATION.md).
+
+## Security
+
+- API keys are stored only in the Streamlit session state and are not persisted to disk
+- The application uses HTTPS for all API requests
+- The Wise API client uses bearer token authentication
+- The application only requests read-only access to your Wise account
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- [Wise API](https://api-docs.wise.com/)
+- [CrewAI](https://github.com/joaomdmoura/crewAI)
+- [Streamlit](https://streamlit.io/)
+- [OpenAI](https://openai.com/)
+- [Pandas](https://pandas.pydata.org/)
+- [Plotly](https://plotly.com/) 
